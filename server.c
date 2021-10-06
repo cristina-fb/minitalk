@@ -6,7 +6,7 @@
 /*   By: crisfern <crisfern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 10:33:37 by crisfern          #+#    #+#             */
-/*   Updated: 2021/10/06 12:22:33 by crisfern         ###   ########.fr       */
+/*   Updated: 2021/10/06 14:57:28 by crisfern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_code	g_code;
 
-void	ft_putnbr(int nb)
+static void	ft_putnbr(int nb)
 {
 	unsigned int	nbr;
 	char			z;
@@ -39,35 +39,36 @@ void	ft_putnbr(int nb)
 	}
 }
 
-void	handler_1(int sig)
+void	handler(int sig)
 {
 	g_code.code = g_code.code << 1;
-	g_code.code++;
+	if (sig == SIGUSR1)
+		g_code.code++;
 	g_code.n_bits++;
 }
 
-void	handler_0(int sig)
+static void	initialize(void)
 {
-	g_code.code = g_code.code << 1;
-	g_code.n_bits++;
-}
-
-int	main(int argc, char **argv)
-{
-	int					pid;
-	struct sigaction	bit0;
-	struct sigaction	bit1;
+	int	pid;
 
 	g_code.code = 0;
 	g_code.n_bits = 0;
-	bit0.sa_handler = &handler_0;
-	bit0.sa_flags = 0;
-	bit1.sa_handler = &handler_1;
-	bit1.sa_flags = 0;
 	pid = getpid();
 	write(1, "El pid del servidor es: ", 24);
 	ft_putnbr(pid);
 	write(1, "\n", 1);
+}
+
+int	main(void)
+{
+	struct sigaction	bit0;
+	struct sigaction	bit1;
+
+	initialize();
+	bit0.sa_handler = &handler;
+	bit0.sa_flags = 0;
+	bit1.sa_handler = &handler;
+	bit1.sa_flags = 0;
 	sigaction(SIGUSR2, &bit0, NULL);
 	sigaction(SIGUSR1, &bit1, NULL);
 	while (1)
@@ -76,6 +77,8 @@ int	main(int argc, char **argv)
 		if (g_code.n_bits == 8)
 		{
 			write(1, &g_code.code, 1);
+			if (g_code.code == 0)
+				write(1, "\n", 1);
 			g_code.n_bits = 0;
 			g_code.code = 0;
 		}
