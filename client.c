@@ -6,7 +6,7 @@
 /*   By: crisfern <crisfern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 10:33:37 by crisfern          #+#    #+#             */
-/*   Updated: 2021/10/06 14:57:11 by crisfern         ###   ########.fr       */
+/*   Updated: 2021/10/08 12:17:25 by crisfern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	main(int argc, char **argv)
 
 	if (argc != 3)
 	{
-		write(1, "Error!\n", 7);
+		write(1, "Error! Introduce a valid pid & a message\n", 42);
 		exit(0);
 	}
 	if (is_valid_pid(argv[1]))
@@ -101,5 +101,7 @@ int	main(int argc, char **argv)
 		}
 		send_char('\n', pid);
 	}
+	else
+		write(1, "Error! Introduce a valid pid\n", 30);
 	return (0);
 }
